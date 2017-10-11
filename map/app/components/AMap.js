@@ -25,6 +25,8 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
   },
+  position: null,
+  error: null,
 });
 
 
@@ -61,7 +63,23 @@ export default class AMap extends Component {
     };
   }
 
+  componentDidMount() {
+    this.watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        this.setState({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          error: null,
+        });
+      },
+      (error) => this.setState({ error: error.message }),
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000, distanceFilter: 10 }
+    );
+  }
 
+  componentWillUnmount() {
+  navigator.geolocation.clearWatch(this.watchId);
+  }
 
   render() {
     return(
