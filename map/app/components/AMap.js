@@ -59,21 +59,24 @@ export default class AMap extends Component {
         strokeWidth: 3,
         strokeColor: '#4286f4',
 
-      }
+      },
+      position: null,
+      error: null
     };
   }
 
   componentDidMount() {
+    console.log("geolocation:", navigator.geolocation);
     this.watchId = navigator.geolocation.watchPosition(
       (position) => {
+        // console.log("position:", position.coords);
         this.setState({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
+          position: position.coords,
           error: null,
         });
       },
-      (error) => this.setState({ error: error.message }),
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000, distanceFilter: 10 }
+      (error) => this.setState({ error: error.message })
+      // { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000, distanceFilter: 10 }
     );
   }
 
@@ -82,6 +85,7 @@ export default class AMap extends Component {
   }
 
   render() {
+    console.log("state:", this.state);
     return(
       <MapView
         style={styles.map}
@@ -102,6 +106,10 @@ export default class AMap extends Component {
         coordinates={this.state.polyline.coordinates}
         strokeColor={this.state.polyline.strokeColor}
         strokeWidth={this.state.polyline.strokeWidth}
+      />
+      <MapView.Marker
+        coordinate={this.state.position}
+        image={require('../../assets/images/current_location_marker.png')}
       />
       </MapView>
     );
