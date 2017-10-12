@@ -69,25 +69,25 @@ export default class AMap extends Component {
         longitudeDelta: 0.0421,
       }
     };
-    // this.onRegionChange = this.onRegionChange.bind(this);
+    this.onRegionChange = this.onRegionChange.bind(this);
   }
 
   componentDidMount() {
     console.log("geolocation:", navigator.geolocation);
     this.watchId = navigator.geolocation.watchPosition(
       (position) => {
-        console.log("position:", position.coords);
+        // console.log("position:", position.coords);
         this.setState({
           position: position.coords,
-          region: {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421
-          },
           error: null,
         });
-        console.log("region:", this.state.region);
+        // console.log("region:", this.state.region);
+        this.onRegionChange({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421
+        });
       },
       (error) => this.setState({ error: error.message }),
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000, distanceFilter: 10 }
@@ -98,20 +98,22 @@ export default class AMap extends Component {
   navigator.geolocation.clearWatch(this.watchId);
   }
 
-  // onRegionChange(region) {
-  //   this.setState({ region });
-  // }
+  onRegionChange(region) {
+    this.refs.map.animateToRegion(region);
+  }
 
   render() {
     // console.log("state:", this.state);
     return(
       <MapView
+        ref="map"
         style={styles.map}
-        region={this.state.region}
+        initialRegion={this.state.region}
         // onRegionChange={this.onRegionChange}
       >
       {this.state.markers.map(marker => {
         return(<MapView.Marker
+          ref="current-position"
           coordinate={marker.latlng}
           title={marker.title}
           description={marker.description}
